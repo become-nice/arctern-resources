@@ -1,0 +1,1140 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="zh-CN" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="zh-CN" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>接口文档 &mdash; Arctern 0.2.0 文档</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/translations.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Arctern
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../python/python.html">Pandas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spark/spark.html">Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../restful/restful.html">Restful</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Arctern</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>接口文档</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/docs/restful-api.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="id1">
+<h1>接口文档<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h1>
+<div class="section" id="scope">
+<h2>创建scope<a class="headerlink" href="#scope" title="永久链接至标题">¶</a></h2>
+<p>arctern的web server支持自定义命令，这里的自定义命令特指python代码，也就是说用户可以向server提交一段特定的python代码，server将执行这段代码并返回运行结果，为了使不同用户使用的变量互不影响，我们需要为这些代码创建作用域，也就是<code class="docutils literal notranslate"><span class="pre">scope</span></code>，该url用于创建一个特定的作用域。</p>
+<p>Note: 如果后端是<code class="docutils literal notranslate"><span class="pre">spark</span></code>，那么创建<code class="docutils literal notranslate"><span class="pre">scope</span></code>的同时，<code class="docutils literal notranslate"><span class="pre">arctern</span></code>会为<code class="docutils literal notranslate"><span class="pre">scope</span></code>创建一个叫做<code class="docutils literal notranslate"><span class="pre">spark</span></code>的<code class="docutils literal notranslate"><span class="pre">SparkSession</span></code>。随后调用的如<code class="docutils literal notranslate"><span class="pre">/loadfile</span></code>、<code class="docutils literal notranslate"><span class="pre">/query</span></code>、<code class="docutils literal notranslate"><span class="pre">/pointmap</span></code>等restful api都会默认在<code class="docutils literal notranslate"><span class="pre">spark</span></code>内进行。</p>
+<div class="section" id="request">
+<h3>Request<a class="headerlink" href="#request" title="永久链接至标题">¶</a></h3>
+<ul class="simple">
+<li><p>Method: <strong>POST</strong></p></li>
+<li><p>URL: <code class="docutils literal notranslate"><span class="pre">/scope</span></code></p></li>
+<li><p>Headers:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/json</span></code></p></li>
+</ul>
+</li>
+<li><p>Body:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>参数说明：</p>
+<ul class="simple">
+<li><p>scope：可选参数，若不指定<code class="docutils literal notranslate"><span class="pre">scope</span></code>，则request的<code class="docutils literal notranslate"><span class="pre">header</span></code>可以省略<code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/json</span></code>，且后台使用<code class="docutils literal notranslate"><span class="pre">uuid</span></code>作为新建的<code class="docutils literal notranslate"><span class="pre">scope</span></code>。</p></li>
+</ul>
+<p>样例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/scope&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;{</span><span class="se">\n\t\&quot;</span><span class="s2">scope</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">scope_name</span><span class="se">\&quot;\n</span><span class="s2">}&quot;</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request POST <span class="s1">&#39;http://localhost:8080/scope&#39;</span> <span class="se">\</span>
+--header <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="se">\</span>
+--data-raw <span class="s1">&#39;{</span>
+<span class="s1">	&quot;scope&quot;:&quot;scope_name&quot;</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="response">
+<h3>Response<a class="headerlink" href="#response" title="永久链接至标题">¶</a></h3>
+<p>成功样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;create scope successfully!&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>错误样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;-1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;scope already exist!&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>删除scope<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
+<p>删除指定的<code class="docutils literal notranslate"><span class="pre">scope</span></code>，该接口一般在用户敲完所有指令后被调用。</p>
+<div class="section" id="id3">
+<h3>Request<a class="headerlink" href="#id3" title="永久链接至标题">¶</a></h3>
+<ul class="simple">
+<li><p>Method: <strong>DELETE</strong></p></li>
+<li><p>URL: <code class="docutils literal notranslate"><span class="pre">/scope/&lt;scope&gt;</span></code></p></li>
+<li><p>Headers:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/json</span></code></p></li>
+</ul>
+</li>
+</ul>
+<p>样例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/scope/scope_name&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">headers</span><span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request DELETE <span class="s1">&#39;http://localhost:8080/scope/scope_name&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h3>Response<a class="headerlink" href="#id4" title="永久链接至标题">¶</a></h3>
+<p>成功样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;delete scope successfully!&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>错误样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;-1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;scope not found!&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>执行命令<a class="headerlink" href="#id5" title="永久链接至标题">¶</a></h2>
+<p>在指定作用域内(<code class="docutils literal notranslate"><span class="pre">scope</span></code>)执行python代码，后台返回执行结果。</p>
+<div class="section" id="id6">
+<h3>Request<a class="headerlink" href="#id6" title="永久链接至标题">¶</a></h3>
+<ul class="simple">
+<li><p>Method: <strong>POST</strong></p></li>
+<li><p>URL: <code class="docutils literal notranslate"><span class="pre">/command</span></code></p></li>
+<li><p>Headers:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/json</span></code></p></li>
+</ul>
+</li>
+<li><p>Body:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;import sys\nprint(len(sys.argv))&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>参数说明：</p>
+<ul class="simple">
+<li><p>scope：该字段指明在哪一个作用域内执行command；</p></li>
+<li><p>command：待执行的<code class="docutils literal notranslate"><span class="pre">python</span></code>代码。</p></li>
+</ul>
+<p>样例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/command&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;{</span><span class="se">\n\t\&quot;</span><span class="s2">scope</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">scope_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n\t\&quot;</span><span class="s2">comamnd</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">import sys</span><span class="se">\\</span><span class="s2">nprint(len(sys.argv))</span><span class="se">\&quot;\n</span><span class="s2">}&quot;</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request POST <span class="s1">&#39;http://localhost:8080/command&#39;</span> <span class="se">\</span>
+--header <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="se">\</span>
+--data-raw <span class="s1">&#39;{</span>
+<span class="s1">	&quot;scope&quot;:&quot;scope_name&quot;,</span>
+<span class="s1">	&quot;comamnd&quot;:&quot;import sys\nprint(len(sys.argv))&quot;</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h3>Response<a class="headerlink" href="#id7" title="永久链接至标题">¶</a></h3>
+<p>正常执行：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;execute command successfully!&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>执行对应代码出现异常：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;400&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;cannot import package1&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id8">
+<h2>从文件中加载表<a class="headerlink" href="#id8" title="永久链接至标题">¶</a></h2>
+<p>在指定作用域(<code class="docutils literal notranslate"><span class="pre">scope</span></code>)内加载文件内容，并执行对应的建表操作，注意，该操作使用<code class="docutils literal notranslate"><span class="pre">scope</span></code>内的<code class="docutils literal notranslate"><span class="pre">spark</span></code>作为默认的<code class="docutils literal notranslate"><span class="pre">SparkSession</span></code>，详见<a class="reference external" href="###/scope">/scope</a>。</p>
+<div class="section" id="id9">
+<h3>Request<a class="headerlink" href="#id9" title="永久链接至标题">¶</a></h3>
+<ul class="simple">
+<li><p>Method: <strong>POST</strong></p></li>
+<li><p>URL: <code class="docutils literal notranslate"><span class="pre">/loadfile</span></code></p></li>
+<li><p>Headers:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/json</span></code></p></li>
+</ul>
+</li>
+<li><p>Body:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;session&quot;</span><span class="p">:</span> <span class="s2">&quot;session_name&quot;</span><span class="p">,</span> 
+    <span class="nt">&quot;tables&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;table_name&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/data.csv&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;header&quot;</span><span class="p">:</span> <span class="s2">&quot;True&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;delimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="nt">&quot;column0&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="nt">&quot;column1&quot;</span><span class="p">:</span> <span class="s2">&quot;double&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="nt">&quot;column2&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>参数说明：</p>
+<ul class="simple">
+<li><p>scope：该字段指明在哪一个作用域内执行建表操作；</p></li>
+<li><p>session：可选参数，该字段指明使用哪个<code class="docutils literal notranslate"><span class="pre">SparkSession</span></code>执行建表操作，若未指定，则使用默认的<code class="docutils literal notranslate"><span class="pre">spark</span></code>；</p></li>
+<li><p>tables：建表描述，该字段为一个列表(<code class="docutils literal notranslate"><span class="pre">list</span></code>)，后台会按顺序进行建表操作，以下为具体参数说明：</p>
+<ul>
+<li><p>name：表名；</p></li>
+<li><p>format：待加载文件的文件格式，目前支持的文件格式有：</p>
+<ul>
+<li><p>csv</p></li>
+<li><p>json</p></li>
+<li><p>parquet</p></li>
+</ul>
+</li>
+<li><p>path：文件路径；</p></li>
+<li><p>options：加载文件时需要指定的选项，该字段使用<code class="docutils literal notranslate"><span class="pre">key-value</span></code>形式，和spark读取文件时保持一致；</p></li>
+<li><p>schema：各列的schema描述，schema字段是一个列表(<code class="docutils literal notranslate"><span class="pre">list</span></code>)，顺序要和文件中各列的实际存储顺序相同。当前支持的schema类型有：（TODO）</p></li>
+</ul>
+</li>
+</ul>
+<p>样例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/loadfile&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;{</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">scope</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">scope_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">session</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">session_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">tables</span><span class="se">\&quot;</span><span class="s2">: [</span><span class="se">\n</span><span class="s2">        {</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">name</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">table_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">format</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">csv</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">path</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">/path/to/data.csv</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">options</span><span class="se">\&quot;</span><span class="s2">: {</span><span class="se">\n</span><span class="s2">                </span><span class="se">\&quot;</span><span class="s2">header</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">True</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">                </span><span class="se">\&quot;</span><span class="s2">delimiter</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;\n</span><span class="s2">            },</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">schema</span><span class="se">\&quot;</span><span class="s2">: [</span><span class="se">\n</span><span class="s2">                {</span><span class="se">\n</span><span class="s2">                    </span><span class="se">\&quot;</span><span class="s2">column0</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">string</span><span class="se">\&quot;\n</span><span class="s2">                },</span><span class="se">\n</span><span class="s2">                {</span><span class="se">\n</span><span class="s2">                    </span><span class="se">\&quot;</span><span class="s2">column1</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">double</span><span class="se">\&quot;\n</span><span class="s2">                },</span><span class="se">\n</span><span class="s2">                {</span><span class="se">\n</span><span class="s2">                    </span><span class="se">\&quot;</span><span class="s2">column2</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">int</span><span class="se">\&quot;\n</span><span class="s2">                }</span><span class="se">\n</span><span class="s2">            ]</span><span class="se">\n</span><span class="s2">        }</span><span class="se">\n</span><span class="s2">    ]</span><span class="se">\n</span><span class="s2">}&quot;</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request POST <span class="s1">&#39;http://localhost:8080/loadfile&#39;</span> <span class="se">\</span>
+--header <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="se">\</span>
+--data-raw <span class="s1">&#39;{</span>
+<span class="s1">    &quot;scope&quot;: &quot;scope_name&quot;,</span>
+<span class="s1">    &quot;session&quot;: &quot;session_name&quot;,</span>
+<span class="s1">    &quot;tables&quot;: [</span>
+<span class="s1">        {</span>
+<span class="s1">            &quot;name&quot;: &quot;table_name&quot;,</span>
+<span class="s1">            &quot;format&quot;: &quot;csv&quot;,</span>
+<span class="s1">            &quot;path&quot;: &quot;/path/to/data.csv&quot;,</span>
+<span class="s1">            &quot;options&quot;: {</span>
+<span class="s1">                &quot;header&quot;: &quot;True&quot;,</span>
+<span class="s1">                &quot;delimiter&quot;: &quot;,&quot;</span>
+<span class="s1">            },</span>
+<span class="s1">            &quot;schema&quot;: [</span>
+<span class="s1">                {</span>
+<span class="s1">                    &quot;column0&quot;: &quot;string&quot;</span>
+<span class="s1">                },</span>
+<span class="s1">                {</span>
+<span class="s1">                    &quot;column1&quot;: &quot;double&quot;</span>
+<span class="s1">                },</span>
+<span class="s1">                {</span>
+<span class="s1">                    &quot;column2&quot;: &quot;int&quot;</span>
+<span class="s1">                }</span>
+<span class="s1">            ]</span>
+<span class="s1">        }</span>
+<span class="s1">    ]</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id10">
+<h3>Response<a class="headerlink" href="#id10" title="永久链接至标题">¶</a></h3>
+<p>成功样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;create table successfully!&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>错误样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;-1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;scope not found!&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id11">
+<h2>保存到文件<a class="headerlink" href="#id11" title="永久链接至标题">¶</a></h2>
+<p>在指定作用域(<code class="docutils literal notranslate"><span class="pre">scope</span></code>)内执行表数据写盘操作，将<code class="docutils literal notranslate"><span class="pre">sql</span></code>的结果存入指定文件，注意，该操作使用<code class="docutils literal notranslate"><span class="pre">scope</span></code>内的<code class="docutils literal notranslate"><span class="pre">spark</span></code>作为默认的<code class="docutils literal notranslate"><span class="pre">SparkSession</span></code>，详见<a class="reference external" href="###/scope">/scope</a>。</p>
+<div class="section" id="id12">
+<h3>Request<a class="headerlink" href="#id12" title="永久链接至标题">¶</a></h3>
+<ul class="simple">
+<li><p>Method: <strong>POST</strong></p></li>
+<li><p>URL: <code class="docutils literal notranslate"><span class="pre">/savetable</span></code></p></li>
+<li><p>Headers:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/json</span></code></p></li>
+</ul>
+</li>
+<li><p>Body:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;session&quot;</span><span class="p">:</span> <span class="s2">&quot;session_name&quot;</span><span class="p">,</span> 
+    <span class="nt">&quot;tables&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;select * from table_name&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/data.csv&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;header&quot;</span><span class="p">:</span> <span class="s2">&quot;True&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;delimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>参数说明：</p>
+<ul class="simple">
+<li><p>scope：该字段指明在哪一个作用域内执行建表操作；</p></li>
+<li><p>session：可选参数，该字段指明使用哪个<code class="docutils literal notranslate"><span class="pre">SparkSession</span></code>执行建表操作，若未指定，则使用默认的<code class="docutils literal notranslate"><span class="pre">spark</span></code>；</p></li>
+<li><p>tables：写盘操作描述，该字段为一个列表(<code class="docutils literal notranslate"><span class="pre">list</span></code>)，后台会按顺序进行写盘操作，以下为具体参数说明：</p>
+<ul>
+<li><p>sql：待执行的query语句，该语句的结果将作为要保存的表；</p></li>
+<li><p>format：待加载文件的文件格式，目前支持的文件格式有：</p>
+<ul>
+<li><p>csv</p></li>
+<li><p>json</p></li>
+<li><p>parquet</p></li>
+</ul>
+</li>
+<li><p>path：文件路径；</p></li>
+<li><p>options：保存文件时需要指定的选项，该字段使用<code class="docutils literal notranslate"><span class="pre">key-value</span></code>形式，和spark保存文件时保持一致；</p></li>
+</ul>
+</li>
+</ul>
+<p>样例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/savetable&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;```json</span><span class="se">\n</span><span class="s2">{</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">scope</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">scope_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">session</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">session_name</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">tables</span><span class="se">\&quot;</span><span class="s2">: [</span><span class="se">\n</span><span class="s2">        {</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">sql</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">select * from table_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">format</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">csv</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">path</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">/path/to/data.csv</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">options</span><span class="se">\&quot;</span><span class="s2">: {</span><span class="se">\n</span><span class="s2">                </span><span class="se">\&quot;</span><span class="s2">header</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">True</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">                </span><span class="se">\&quot;</span><span class="s2">delimiter</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;\n</span><span class="s2">            }</span><span class="se">\n</span><span class="s2">        }</span><span class="se">\n</span><span class="s2">    ]</span><span class="se">\n</span><span class="s2">}&quot;</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request POST <span class="s1">&#39;http://localhost:8080/savetable&#39;</span> <span class="se">\</span>
+--header <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="se">\</span>
+--data-raw <span class="s1">&#39;```json</span>
+<span class="s1">{</span>
+<span class="s1">    &quot;scope&quot;: &quot;scope_name&quot;,</span>
+<span class="s1">    &quot;session&quot;: &quot;session_name&quot;, </span>
+<span class="s1">    &quot;tables&quot;: [</span>
+<span class="s1">        {</span>
+<span class="s1">            &quot;sql&quot;: &quot;select * from table_name&quot;,</span>
+<span class="s1">            &quot;format&quot;: &quot;csv&quot;,</span>
+<span class="s1">            &quot;path&quot;: &quot;/path/to/data.csv&quot;,</span>
+<span class="s1">            &quot;options&quot;: {</span>
+<span class="s1">                &quot;header&quot;: &quot;True&quot;,</span>
+<span class="s1">                &quot;delimiter&quot;: &quot;,&quot;</span>
+<span class="s1">            }</span>
+<span class="s1">        }</span>
+<span class="s1">    ]</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id13">
+<h3>Response<a class="headerlink" href="#id13" title="永久链接至标题">¶</a></h3>
+<p>成功样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;save table successfully!&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>错误样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;-1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;scope not found!&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id14">
+<h2>表信息统计<a class="headerlink" href="#id14" title="永久链接至标题">¶</a></h2>
+<p>返回表的统计信息，包括<code class="docutils literal notranslate"><span class="pre">schema</span></code>信息、行数等。(TODO: spark与pandas交集)</p>
+<div class="section" id="id15">
+<h3>Request<a class="headerlink" href="#id15" title="永久链接至标题">¶</a></h3>
+<ul class="simple">
+<li><p>Method: <strong>GET</strong></p></li>
+<li><p>URL: /table?scope=scope1&amp;session=spark&amp;table=table1</p></li>
+<li><p>scope_name：该字段指明在哪一个作用域内查询表的信息；</p></li>
+<li><p>session_name：可选参数，该字段指明使用哪个<code class="docutils literal notranslate"><span class="pre">SparkSession</span></code>查询表的信息，若未指定，则使用默认的<code class="docutils literal notranslate"><span class="pre">spark</span></code>；</p></li>
+<li><p>table_name：表名。</p></li>
+</ul>
+<p>样例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/table?scope=scope1&amp;session=spark&amp;table=table1&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">headers</span><span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request GET <span class="s1">&#39;http://localhost:8080/table?scope=scope1&amp;session=spark&amp;table=table1&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id16">
+<h3>Response<a class="headerlink" href="#id16" title="永久链接至标题">¶</a></h3>
+<p>成功样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;table_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="nt">&quot;column0&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="nt">&quot;column1&quot;</span><span class="p">:</span> <span class="s2">&quot;double&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="nt">&quot;column2&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">}</span>
+    <span class="p">],</span>
+    <span class="nt">&quot;num_rows&quot;</span><span class="p">:</span> <span class="mi">500</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>错误样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;-1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;table not found!&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id17">
+<h2>查询<a class="headerlink" href="#id17" title="永久链接至标题">¶</a></h2>
+<p>执行<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句，可以选择是否将<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句的结果返回，如果是，则将结果以<code class="docutils literal notranslate"><span class="pre">json</span></code>形式返回。</p>
+<div class="section" id="id18">
+<h3>Request<a class="headerlink" href="#id18" title="永久链接至标题">¶</a></h3>
+<ul class="simple">
+<li><p>Method: <strong>POST</strong></p></li>
+<li><p>URL: <code class="docutils literal notranslate"><span class="pre">/query</span></code></p></li>
+<li><p>Headers:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/json</span></code></p></li>
+</ul>
+</li>
+<li><p>Body:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;session&quot;</span><span class="p">:</span> <span class="s2">&quot;session_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;select * from table_name limit 1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;collect_result&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;session&quot;</span><span class="p">:</span> <span class="s2">&quot;session_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;create table new_table as (select * from table_name)&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;collect_result&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>参数说明：</p>
+<ul class="simple">
+<li><p>scope：该字段指明在哪一个作用域内执行<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句；</p></li>
+<li><p>session：可选参数，该字段指明使用哪个<code class="docutils literal notranslate"><span class="pre">SparkSession</span></code>执行<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句，若未指定，则使用默认的<code class="docutils literal notranslate"><span class="pre">spark</span></code>；</p></li>
+<li><p>sql：待执行的query语句；</p></li>
+<li><p>collect_result：可选参数，默认为<code class="docutils literal notranslate"><span class="pre">1</span></code>，<code class="docutils literal notranslate"><span class="pre">1</span></code>表示将<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句的结果用<code class="docutils literal notranslate"><span class="pre">json</span></code>形式返回，<code class="docutils literal notranslate"><span class="pre">0</span></code>表示不返回结果。</p></li>
+</ul>
+<p>样例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/query&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;{</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">scope</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">scope_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">session</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">session_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">sql</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">select * from table_name limit 1</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">collect_result</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">1</span><span class="se">\&quot;\n</span><span class="s2">}&quot;</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request POST <span class="s1">&#39;http://localhost:8080/query&#39;</span> <span class="se">\</span>
+--header <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="se">\</span>
+--data-raw <span class="s1">&#39;{</span>
+<span class="s1">    &quot;scope&quot;: &quot;scope_name&quot;,</span>
+<span class="s1">    &quot;session&quot;: &quot;session_name&quot;,</span>
+<span class="s1">    &quot;sql&quot;: &quot;select * from table_name limit 1&quot;,</span>
+<span class="s1">    &quot;collect_result&quot;: &quot;1&quot;</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/query&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;{</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">scope</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">scope_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">session</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">session_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">sql</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">create table new_table as (select * from table_name)</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">collect_result</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">0</span><span class="se">\&quot;\n</span><span class="s2">}&quot;</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request POST <span class="s1">&#39;http://localhost:8080/query&#39;</span> <span class="se">\</span>
+--header <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="se">\</span>
+--data-raw <span class="s1">&#39;{</span>
+<span class="s1">    &quot;scope&quot;: &quot;scope_name&quot;,</span>
+<span class="s1">    &quot;session&quot;: &quot;session_name&quot;,</span>
+<span class="s1">    &quot;sql&quot;: &quot;create table new_table as (select * from table_name)&quot;,</span>
+<span class="s1">    &quot;collect_result&quot;: &quot;0&quot;</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id19">
+<h3>Response<a class="headerlink" href="#id19" title="永久链接至标题">¶</a></h3>
+<p>样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;succuss&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;result&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">[</span><span class="s2">&quot;col1&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="p">],</span>
+    <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;execute sql successfully!&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id20">
+<h2>点图<a class="headerlink" href="#id20" title="永久链接至标题">¶</a></h2>
+<p>点图，根据<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句以及相关画图参数绘制点图，将编码后的图片数据返回。</p>
+<ul class="simple">
+<li><p>Method: <strong>POST</strong></p></li>
+<li><p>URL: <code class="docutils literal notranslate"><span class="pre">/pointmap</span></code></p></li>
+<li><p>Headers:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/json</span></code></p></li>
+</ul>
+</li>
+<li><p>Body:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;session&quot;</span><span class="p">:</span> <span class="s2">&quot;session_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;select ST_Point(col2, col2) as point from table_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;width&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="nt">&quot;height&quot;</span><span class="p">:</span> <span class="mi">896</span><span class="p">,</span>
+        <span class="nt">&quot;bounding_box&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">-75.37976</span><span class="p">,</span> <span class="mf">40.191296</span><span class="p">,</span> <span class="mf">-71.714099</span><span class="p">,</span> <span class="mf">41.897445</span><span class="p">],</span>
+        <span class="nt">&quot;coordinate_system&quot;</span><span class="p">:</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;point_color&quot;</span><span class="p">:</span> <span class="s2">&quot;#2DEF4A&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;point_size&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="nt">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">0.5</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>参数说明：</p>
+<ul class="simple">
+<li><p>scope：该字段指明在哪一个作用域内执行<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句；</p></li>
+<li><p>session：可选参数，该字段指明使用哪个<code class="docutils literal notranslate"><span class="pre">SparkSession</span></code>执行<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句，若未指定，则使用默认的<code class="docutils literal notranslate"><span class="pre">spark</span></code>；</p></li>
+<li><p>sql：待执行的query语句，该sql的结果作为绘制点图的渲染对象；</p></li>
+<li><p>params：绘制点图时需要的参数，具体说明如下：</p>
+<ul>
+<li><p>width：图片宽度；</p></li>
+<li><p>height：图片高度；</p></li>
+<li><p>bounding_box：渲染图片所表示的地理范围[<code class="docutils literal notranslate"><span class="pre">x_min</span></code>, <code class="docutils literal notranslate"><span class="pre">y_min</span></code>, <code class="docutils literal notranslate"><span class="pre">x_max</span></code>, <code class="docutils literal notranslate"><span class="pre">y_max</span></code>]；</p></li>
+<li><p>coordinate_system：输入数据的坐标系统，详见<a class="reference external" href="https://en.wikipedia.org/wiki/World_Geodetic_System">World Geodetic System</a>；</p></li>
+<li><p>point_size：点的大小；</p></li>
+<li><p>point_color：点的颜色；</p></li>
+<li><p>opacity：点的不透明度；</p></li>
+</ul>
+</li>
+</ul>
+<p>样例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/pointmap&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;{</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">scope</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">scope_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">session</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">session_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">sql</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">select ST_Point(col2, col2) as point from table_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">params</span><span class="se">\&quot;</span><span class="s2">: {</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">width</span><span class="se">\&quot;</span><span class="s2">: 1024,</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">height</span><span class="se">\&quot;</span><span class="s2">: 896,</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">bounding_box</span><span class="se">\&quot;</span><span class="s2">: [-75.37976, 40.191296, -71.714099, 41.897445],</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">coordinate_system</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">EPSG:4326</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">point_color</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">#2DEF4A</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">point_size</span><span class="se">\&quot;</span><span class="s2">: 3,</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">opacity</span><span class="se">\&quot;</span><span class="s2">: 0.5</span><span class="se">\n</span><span class="s2">    }</span><span class="se">\n</span><span class="s2">}&quot;</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request POST <span class="s1">&#39;http://localhost:8080/pointmap&#39;</span> <span class="se">\</span>
+--header <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="se">\</span>
+--data-raw <span class="s1">&#39;{</span>
+<span class="s1">    &quot;scope&quot;: &quot;scope_name&quot;,</span>
+<span class="s1">    &quot;session&quot;: &quot;session_name&quot;,</span>
+<span class="s1">    &quot;sql&quot;: &quot;select ST_Point(col2, col2) as point from table_name&quot;,</span>
+<span class="s1">    &quot;params&quot;: {</span>
+<span class="s1">        &quot;width&quot;: 1024,</span>
+<span class="s1">        &quot;height&quot;: 896,</span>
+<span class="s1">        &quot;bounding_box&quot;: [-75.37976, 40.191296, -71.714099, 41.897445],</span>
+<span class="s1">        &quot;coordinate_system&quot;: &quot;EPSG:4326&quot;,</span>
+<span class="s1">        &quot;point_color&quot;: &quot;#2DEF4A&quot;,</span>
+<span class="s1">        &quot;point_size&quot;: 3,</span>
+<span class="s1">        &quot;opacity&quot;: 0.5</span>
+<span class="s1">    }</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+<div class="section" id="id21">
+<h3>Response<a class="headerlink" href="#id21" title="永久链接至标题">¶</a></h3>
+<p>样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;result&quot;</span><span class="p">:</span> <span class="s2">&quot;使用base64编码后的点图数据&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id22">
+<h2>热力图<a class="headerlink" href="#id22" title="永久链接至标题">¶</a></h2>
+<p>热力图，根据<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句以及相关画图参数绘制热力图，将编码后的图片数据返回。</p>
+<ul class="simple">
+<li><p>Method: <strong>POST</strong></p></li>
+<li><p>URL: <code class="docutils literal notranslate"><span class="pre">/heatmap</span></code></p></li>
+<li><p>Headers:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/json</span></code></p></li>
+</ul>
+</li>
+<li><p>Body:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;session&quot;</span><span class="p">:</span> <span class="s2">&quot;session_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;select ST_Point(col2, col2) as point from table_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;width&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="nt">&quot;height&quot;</span><span class="p">:</span> <span class="mi">896</span><span class="p">,</span>
+        <span class="nt">&quot;bounding_box&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">-75.37976</span><span class="p">,</span> <span class="mf">40.191296</span><span class="p">,</span> <span class="mf">-71.714099</span><span class="p">,</span> <span class="mf">41.897445</span><span class="p">],</span>
+        <span class="nt">&quot;coordinate_system&quot;</span><span class="p">:</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;map_zoom_level&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="nt">&quot;aggragation_type&quot;</span><span class="p">:</span> <span class="s2">&quot;sum&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>参数说明：</p>
+<ul class="simple">
+<li><p>scope：该字段指明在哪一个作用域内执行<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句；</p></li>
+<li><p>session：可选参数，该字段指明使用哪个<code class="docutils literal notranslate"><span class="pre">SparkSession</span></code>执行<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句，若未指定，则使用默认的<code class="docutils literal notranslate"><span class="pre">spark</span></code>；</p></li>
+<li><p>sql：待执行的query语句，该sql的结果作为绘制热力图的渲染对象；</p></li>
+<li><p>params：绘制热力图时需要的参数，具体说明如下：</p>
+<ul>
+<li><p>width：图片宽度；</p></li>
+<li><p>height：图片高度；</p></li>
+<li><p>bounding_box：渲染图片所表示的地理范围[<code class="docutils literal notranslate"><span class="pre">x_min</span></code>, <code class="docutils literal notranslate"><span class="pre">y_min</span></code>, <code class="docutils literal notranslate"><span class="pre">x_max</span></code>, <code class="docutils literal notranslate"><span class="pre">y_max</span></code>]；</p></li>
+<li><p>coordinate_system：输入数据的坐标系统，详见<a class="reference external" href="https://en.wikipedia.org/wiki/World_Geodetic_System">World Geodetic System</a>；</p></li>
+<li><p>map_zoom_level：地图放大比例，取值范围<code class="docutils literal notranslate"><span class="pre">(1</span> <span class="pre">~</span> <span class="pre">15)</span></code>；</p></li>
+<li><p>aggregation_type：聚合类型。</p></li>
+</ul>
+</li>
+</ul>
+<p>样例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/heatmap&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;{</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">scope</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">scope_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">session</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">session_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">sql</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">select ST_Point(col2, col2) as point from table_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">params</span><span class="se">\&quot;</span><span class="s2">: {</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">width</span><span class="se">\&quot;</span><span class="s2">: 1024,</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">height</span><span class="se">\&quot;</span><span class="s2">: 896,</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">bounding_box</span><span class="se">\&quot;</span><span class="s2">: [-75.37976, 40.191296, -71.714099, 41.897445],</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">coordinate_system</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">EPSG:4326</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">map_zoom_level</span><span class="se">\&quot;</span><span class="s2">: 10</span><span class="se">\n</span><span class="s2">    }</span><span class="se">\n</span><span class="s2">}&quot;</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request POST <span class="s1">&#39;http://localhost:8080/heatmap&#39;</span> <span class="se">\</span>
+--header <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="se">\</span>
+--data-raw <span class="s1">&#39;{</span>
+<span class="s1">    &quot;scope&quot;: &quot;scope_name&quot;,</span>
+<span class="s1">    &quot;session&quot;: &quot;session_name&quot;,</span>
+<span class="s1">    &quot;sql&quot;: &quot;select ST_Point(col2, col2) as point from table_name&quot;,</span>
+<span class="s1">    &quot;params&quot;: {</span>
+<span class="s1">        &quot;width&quot;: 1024,</span>
+<span class="s1">        &quot;height&quot;: 896,</span>
+<span class="s1">        &quot;bounding_box&quot;: [-75.37976, 40.191296, -71.714099, 41.897445],</span>
+<span class="s1">        &quot;coordinate_system&quot;: &quot;EPSG:4326&quot;,</span>
+<span class="s1">        &quot;map_zoom_level&quot;: 10</span>
+<span class="s1">    }</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+<div class="section" id="id23">
+<h3>Response<a class="headerlink" href="#id23" title="永久链接至标题">¶</a></h3>
+<p>样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;result&quot;</span><span class="p">:</span> <span class="s2">&quot;使用base64编码后的热力图数据&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id24">
+<h2>轮廓图<a class="headerlink" href="#id24" title="永久链接至标题">¶</a></h2>
+<p>轮廓图，根据<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句以及相关画图参数绘制轮廓图，将编码后的图片数据返回。</p>
+<ul class="simple">
+<li><p>Method: <strong>POST</strong></p></li>
+<li><p>URL: <code class="docutils literal notranslate"><span class="pre">/choroplethmap</span></code></p></li>
+<li><p>Headers:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/json</span></code></p></li>
+</ul>
+</li>
+<li><p>Body:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;session&quot;</span><span class="p">:</span> <span class="s2">&quot;session_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;select ST_Point(col2, col2) as point, col2 as count from table_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;width&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="nt">&quot;height&quot;</span><span class="p">:</span> <span class="mi">896</span><span class="p">,</span>
+        <span class="nt">&quot;bounding_box&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">-75.37976</span><span class="p">,</span> <span class="mf">40.191296</span><span class="p">,</span> <span class="mf">-71.714099</span><span class="p">,</span> <span class="mf">41.897445</span><span class="p">],</span>
+        <span class="nt">&quot;coordinate_system&quot;</span><span class="p">:</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;color_gradient&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;#0000FF&quot;</span><span class="p">,</span> <span class="s2">&quot;#FF0000&quot;</span><span class="p">],</span>
+        <span class="nt">&quot;color_bound&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+        <span class="nt">&quot;opacity&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="nt">&quot;aggregation_type&quot;</span><span class="p">:</span> <span class="s2">&quot;sum&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>参数说明：</p>
+<ul class="simple">
+<li><p>scope：该字段指明在哪一个作用域内执行<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句；</p></li>
+<li><p>session：可选参数，该字段指明使用哪个<code class="docutils literal notranslate"><span class="pre">SparkSession</span></code>执行<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句，若未指定，则使用默认的<code class="docutils literal notranslate"><span class="pre">spark</span></code>；</p></li>
+<li><p>sql：待执行的query语句，该sql的结果作为绘制轮廓图的渲染对象；</p></li>
+<li><p>params：绘制轮廓图时需要的参数，具体说明如下：</p>
+<ul>
+<li><p>width：图片宽度；</p></li>
+<li><p>height：图片高度；</p></li>
+<li><p>bounding_box：渲染图片所表示的地理范围[<code class="docutils literal notranslate"><span class="pre">x_min</span></code>, <code class="docutils literal notranslate"><span class="pre">y_min</span></code>, <code class="docutils literal notranslate"><span class="pre">x_max</span></code>, <code class="docutils literal notranslate"><span class="pre">y_max</span></code>]；</p></li>
+<li><p>coordinate_system：输入数据的坐标系统，详见<a class="reference external" href="https://en.wikipedia.org/wiki/World_Geodetic_System">World Geodetic System</a>；</p></li>
+<li><p>color_gradient：点的颜色渐变范围，即点的颜色从左边渐变到右边；</p></li>
+<li><p>color_bound：点颜色的取值范围，与<code class="docutils literal notranslate"><span class="pre">color_gradient</span></code>配合使用；</p></li>
+<li><p>opacity：点的不透明度。</p></li>
+<li><p>aggregation_type：聚合类型。</p></li>
+</ul>
+</li>
+</ul>
+<p>样例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/choroplethmap&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;{</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">scope</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">scope_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">session</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">session_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">sql</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">select ST_Point(col2, col2) as point, col2 as count from table_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">params</span><span class="se">\&quot;</span><span class="s2">: {</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">width</span><span class="se">\&quot;</span><span class="s2">: 1024,</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">height</span><span class="se">\&quot;</span><span class="s2">: 896,</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">bounding_box</span><span class="se">\&quot;</span><span class="s2">: [-75.37976, 40.191296, -71.714099, 41.897445],</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">coordinate_system</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">EPSG:4326</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">color_gradient</span><span class="se">\&quot;</span><span class="s2">: [</span><span class="se">\&quot;</span><span class="s2">#0000FF</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="s2">#FF0000</span><span class="se">\&quot;</span><span class="s2">],</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">color_bound</span><span class="se">\&quot;</span><span class="s2">: [2.5, 5],</span><span class="se">\n</span><span class="s2">        </span><span class="se">\&quot;</span><span class="s2">opacity</span><span class="se">\&quot;</span><span class="s2">: 1</span><span class="se">\n</span><span class="s2">    }</span><span class="se">\n</span><span class="s2">}&quot;</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request POST <span class="s1">&#39;http://localhost:8080/choroplethmap&#39;</span> <span class="se">\</span>
+--header <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="se">\</span>
+--data-raw <span class="s1">&#39;{</span>
+<span class="s1">    &quot;scope&quot;: &quot;scope_name&quot;,</span>
+<span class="s1">    &quot;session&quot;: &quot;session_name&quot;,</span>
+<span class="s1">    &quot;sql&quot;: &quot;select ST_Point(col2, col2) as point, col2 as count from table_name&quot;,</span>
+<span class="s1">    &quot;params&quot;: {</span>
+<span class="s1">        &quot;width&quot;: 1024,</span>
+<span class="s1">        &quot;height&quot;: 896,</span>
+<span class="s1">        &quot;bounding_box&quot;: [-75.37976, 40.191296, -71.714099, 41.897445],</span>
+<span class="s1">        &quot;coordinate_system&quot;: &quot;EPSG:4326&quot;,</span>
+<span class="s1">        &quot;color_gradient&quot;: [&quot;#0000FF&quot;, &quot;#FF0000&quot;],</span>
+<span class="s1">        &quot;color_bound&quot;: [2.5, 5],</span>
+<span class="s1">        &quot;opacity&quot;: 1</span>
+<span class="s1">    }</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+<div class="section" id="id25">
+<h3>Response<a class="headerlink" href="#id25" title="永久链接至标题">¶</a></h3>
+<p>样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;result&quot;</span><span class="p">:</span> <span class="s2">&quot;使用base64编码后的轮廓图数据&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id26">
+<h2>权重图<a class="headerlink" href="#id26" title="永久链接至标题">¶</a></h2>
+<p>权重图，根据<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句以及相关画图参数绘制权重图，将编码后的图片数据返回。</p>
+<ul class="simple">
+<li><p>Method: <strong>POST</strong></p></li>
+<li><p>URL: <code class="docutils literal notranslate"><span class="pre">/weighted_pointmap</span></code></p></li>
+<li><p>Headers:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/json</span></code></p></li>
+</ul>
+</li>
+<li><p>Body:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;scope_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;session&quot;</span><span class="p">:</span> <span class="s2">&quot;session_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sql&quot;</span><span class="p">:</span> <span class="s2">&quot;select ST_Point(col2, col2) as point, col2 as count1, col2 as count2 from table_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;width&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+            <span class="nt">&quot;height&quot;</span><span class="p">:</span> <span class="mi">896</span><span class="p">,</span>
+            <span class="nt">&quot;bounding_box&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">-75.37976</span><span class="p">,</span> <span class="mf">40.191296</span><span class="p">,</span> <span class="mf">-71.714099</span><span class="p">,</span> <span class="mf">41.897445</span><span class="p">],</span>
+            <span class="nt">&quot;color_gradient&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;#0000FF&quot;</span><span class="p">,</span> <span class="s2">&quot;#FF0000&quot;</span><span class="p">],</span>
+            <span class="nt">&quot;color_bound&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="nt">&quot;size_bound&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+            <span class="nt">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="nt">&quot;coordinate_system&quot;</span><span class="p">:</span> <span class="s2">&quot;EPSG:4326&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>参数说明：</p>
+<ul class="simple">
+<li><p>scope：该字段指明在哪一个作用域内执行<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句；</p></li>
+<li><p>session：可选参数，该字段指明使用哪个<code class="docutils literal notranslate"><span class="pre">SparkSession</span></code>执行<code class="docutils literal notranslate"><span class="pre">sql</span></code>语句，若未指定，则使用默认的<code class="docutils literal notranslate"><span class="pre">spark</span></code>；</p></li>
+<li><p>sql：待执行的query语句，该sql的结果作为绘制权重图的渲染对象；</p></li>
+<li><p>params：绘制权重图时需要的参数，具体说明如下：</p>
+<ul>
+<li><p>width：图片宽度；</p></li>
+<li><p>height：图片高度；</p></li>
+<li><p>bounding_box：渲染图片所表示的地理范围[<code class="docutils literal notranslate"><span class="pre">x_min</span></code>, <code class="docutils literal notranslate"><span class="pre">y_min</span></code>, <code class="docutils literal notranslate"><span class="pre">x_max</span></code>, <code class="docutils literal notranslate"><span class="pre">y_max</span></code>]；</p></li>
+<li><p>coordinate_system：输入数据的坐标系统，详见<a class="reference external" href="https://en.wikipedia.org/wiki/World_Geodetic_System">World Geodetic System</a>；</p></li>
+<li><p>color_gradient：点的颜色渐变范围，即点的颜色从左边渐变到右边；</p></li>
+<li><p>color_bound：点颜色的取值范围，与<code class="docutils literal notranslate"><span class="pre">color_gradient</span></code>配合使用；</p></li>
+<li><p>opacity：点的不透明度；</p></li>
+<li><p>size_bound：点大小的取值范围。</p></li>
+</ul>
+</li>
+</ul>
+<p>样例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:8080/weighted_pointmap&quot;</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;{</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">scope</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">scope_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">session</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">session_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">sql</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">select ST_Point(col2, col2) as point, col2 as count1, col2 as count2 from table_name</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    </span><span class="se">\&quot;</span><span class="s2">params</span><span class="se">\&quot;</span><span class="s2">: {</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">width</span><span class="se">\&quot;</span><span class="s2">: 1024,</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">height</span><span class="se">\&quot;</span><span class="s2">: 896,</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">bounding_box</span><span class="se">\&quot;</span><span class="s2">: [-75.37976, 40.191296, -71.714099, 41.897445],</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">color_gradient</span><span class="se">\&quot;</span><span class="s2">: [</span><span class="se">\&quot;</span><span class="s2">#0000FF</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="s2">#FF0000</span><span class="se">\&quot;</span><span class="s2">],</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">color_bound</span><span class="se">\&quot;</span><span class="s2">: [0, 2],</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">size_bound</span><span class="se">\&quot;</span><span class="s2">: [0, 10],</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">opacity</span><span class="se">\&quot;</span><span class="s2">: 1.0,</span><span class="se">\n</span><span class="s2">            </span><span class="se">\&quot;</span><span class="s2">coordinate_system</span><span class="se">\&quot;</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">EPSG:4326</span><span class="se">\&quot;\n</span><span class="s2">    }</span><span class="se">\n</span><span class="s2">}&quot;</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl --location --request POST <span class="s1">&#39;http://localhost:8080/weighted_pointmap&#39;</span> <span class="se">\</span>
+--header <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="se">\</span>
+--data-raw <span class="s1">&#39;{</span>
+<span class="s1">    &quot;scope&quot;: &quot;scope_name&quot;,</span>
+<span class="s1">    &quot;session&quot;: &quot;session_name&quot;,</span>
+<span class="s1">    &quot;sql&quot;: &quot;select ST_Point(col2, col2) as point, col2 as count1, col2 as count2 from table_name&quot;,</span>
+<span class="s1">    &quot;params&quot;: {</span>
+<span class="s1">            &quot;width&quot;: 1024,</span>
+<span class="s1">            &quot;height&quot;: 896,</span>
+<span class="s1">            &quot;bounding_box&quot;: [-75.37976, 40.191296, -71.714099, 41.897445],</span>
+<span class="s1">            &quot;color_gradient&quot;: [&quot;#0000FF&quot;, &quot;#FF0000&quot;],</span>
+<span class="s1">            &quot;color_bound&quot;: [0, 2],</span>
+<span class="s1">            &quot;size_bound&quot;: [0, 10],</span>
+<span class="s1">            &quot;opacity&quot;: 1.0,</span>
+<span class="s1">            &quot;coordinate_system&quot;: &quot;EPSG:4326&quot;</span>
+<span class="s1">    }</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+<div class="section" id="id27">
+<h3>Response<a class="headerlink" href="#id27" title="永久链接至标题">¶</a></h3>
+<p>样例：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;result&quot;</span><span class="p">:</span> <span class="s2">&quot;使用base64编码后的权重图数据&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, zilliz
+      <span class="lastupdated">
+        最后更新于 4月 23, 2020.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
